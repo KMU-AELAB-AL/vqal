@@ -19,8 +19,8 @@ from data.transform import Cifar
 from models.resnet import ResNet18
 from models.featurenet import FeatureNet
 
-import autoencoder.models.vae as vae
 import autoencoder.models.ae as ae
+import autoencoder.models.vae as vae
 
 from data.sampler import SubsetSequentialSampler
 
