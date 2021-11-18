@@ -43,7 +43,7 @@ def train_epoch(model, criterion, opt, dataloaders, summary_writer, epoch):
 
         opt.zero_grad()
         inputs = data[0].cuda()
-        targets = data[0].cuda()
+        targets = data[1].cuda()
 
         recon, features, mu, logvar = model(inputs)
         recon_loss = criterion(recon, inputs)
