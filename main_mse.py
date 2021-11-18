@@ -95,7 +95,6 @@ def train_epoch(models, criterion, optimizers, dataloaders):
 
         loss.backward()
         optimizers['backbone'].step()
-        optimizers['module'].step()
 
 
 def test(models, dataloaders, mode='val'):
