@@ -43,10 +43,11 @@ def train_epoch(model, criterion, opt, dataloaders, summary_writer, epoch):
 
         opt.zero_grad()
         inputs = data[0].cuda()
+        targets = data[0].cuda()
 
         recon, features, mu, logvar = model(inputs)
         recon_loss = criterion(recon, inputs)
-        kld_loss = torch.mean(-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim=1), dim=0)
+        kld_loss = torch.sum(-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim=1), dim=0)
 
         loss = recon_loss + (0.01 * kld_loss)
 
@@ -58,6 +59,8 @@ def train_epoch(model, criterion, opt, dataloaders, summary_writer, epoch):
     summary_writer.add_image('image/origin', inputs[0], epoch)
     summary_writer.add_image('image/recon', recon[0], epoch)
     summary_writer.add_scalar('loss', _loss / cnt, epoch)
+    summary_writer.add_embedding(features[:200].detach(), metadata=targets[:200].detach().cpu().numpy(),
+                                 label_img=inputs[:200].detach(), global_step=epoch)
 
     return _loss / cnt
 
@@ -113,7 +116,7 @@ if __name__ == '__main__':
     model = VAE(NUM_RESIDUAL_LAYERS, NUM_RESIDUAL_HIDDENS, EMBEDDING_DIM).cuda()
     torch.backends.cudnn.benchmark = False
 
-    criterion = nn.MSELoss().cuda()
+    criterion = nn.MSELoss(reduction='sum').cuda()
     opt = optim.Adam(model.parameters(), lr=LR)
 
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=0.8, cooldown=4)
