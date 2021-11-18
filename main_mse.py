@@ -125,6 +125,8 @@ def train(models, criterion, optimizers, schedulers, dataloaders, num_epochs):
 
     for epoch in range(num_epochs * 2):
         loss = train_module(models, optimizers, dataloaders)
+        if loss < 0.3:
+            return
         schedulers['module'].step(loss)
 
     print('>> Finished.')
