@@ -120,10 +120,6 @@ def test(models, dataloaders, mode='val'):
 def train(models, criterion, optimizers, schedulers, dataloaders, num_epochs):
     print('>> Train a Model.')
 
-    checkpoint_dir = os.path.join(f'./{DATASET}', 'train', 'weights')
-    if not os.path.exists(checkpoint_dir):
-        os.makedirs(checkpoint_dir)
-
     for epoch in range(num_epochs):
         schedulers['backbone'].step()
         train_epoch(models, criterion, optimizers, dataloaders)
