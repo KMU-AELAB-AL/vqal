@@ -59,8 +59,10 @@ def train_epoch(model, criterion, opt, dataloaders, summary_writer, epoch):
     summary_writer.add_image('image/origin', inputs[0], epoch)
     summary_writer.add_image('image/recon', recon[0], epoch)
     summary_writer.add_scalar('loss', _loss / cnt, epoch)
-    summary_writer.add_embedding(features[:200].detach(), metadata=targets[:200].detach().cpu().numpy(),
-                                 label_img=inputs[:200].detach(), global_step=epoch)
+
+    if epoch % 100 == 99:
+        summary_writer.add_embedding(features[:200].detach(), metadata=targets[:200].detach().cpu().numpy(),
+                                     label_img=inputs[:200].detach(), global_step=epoch)
 
     return _loss / cnt
 
