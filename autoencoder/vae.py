@@ -49,7 +49,7 @@ def train_epoch(model, criterion, opt, dataloaders, summary_writer, epoch):
         recon_loss = criterion(recon, inputs)
         kld_loss = torch.sum(-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim=1), dim=0)
 
-        loss = recon_loss + (0.01 * kld_loss)
+        loss = recon_loss + kld_loss
 
         loss.backward()
         opt.step()
@@ -61,8 +61,8 @@ def train_epoch(model, criterion, opt, dataloaders, summary_writer, epoch):
     summary_writer.add_scalar('loss', _loss / cnt, epoch)
 
     if epoch % 100 == 99:
-        summary_writer.add_embedding(features[:200].detach(), metadata=targets[:200].detach().cpu().numpy(),
-                                     label_img=inputs[:200].detach(), global_step=epoch)
+        summary_writer.add_embedding(features.detach(), metadata=targets.detach().cpu().numpy(),
+                                     label_img=inputs.detach(), global_step=epoch)
 
     return _loss / cnt
 
