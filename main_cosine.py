@@ -24,11 +24,9 @@ import autoencoder.models.vae as vae
 
 from data.sampler import SubsetSequentialSampler
 
-
 random.seed('KMU_AELAB')
 torch.manual_seed(0)
 torch.backends.cudnn.deterministic = True
-
 
 transforms = Cifar()
 
@@ -68,7 +66,7 @@ def train_module(models, optimizers, criterions, dataloaders):
         pred_feature = pred_feature.view([-1, EMBEDDING_DIM])
         ae_out = models['ae'](inputs)
 
-        loss = criterions['module'](pred_feature, ae_out[1].detach())
+        loss = torch.mean(1 - criterions['module'](pred_feature, ae_out[1].detach()))
 
         loss.backward()
         optimizers['module'].step()
@@ -187,7 +185,7 @@ if __name__ == '__main__':
 
         for cycle in range(CYCLES):
             criterion = nn.CrossEntropyLoss().cuda()
-            m_criterion = nn.MSELoss().cuda()
+            m_criterion = nn.CosineSimilarity(dim=1, eps=1e-6).cuda()
             criterions = {'backbone': criterion, 'module': m_criterion}
 
             optim_backbone = optim.SGD(models['backbone'].parameters(), lr=LR,
@@ -219,7 +217,7 @@ if __name__ == '__main__':
             arg = np.argsort(uncertainty)
 
             labeled_set += list(torch.tensor(subset)[arg][-ADDENDUM:].numpy())
-            unlabeled_set = list(torch.tensor(subset)[arg][:-ADDENDUM].numpy())# + unlabeled_set[SUBSET:]
+            unlabeled_set = list(torch.tensor(subset)[arg][:-ADDENDUM].numpy())  # + unlabeled_set[SUBSET:]
 
             dataloaders['train'] = DataLoader(data_train, batch_size=BATCH,
                                               sampler=SubsetRandomSampler(labeled_set),
