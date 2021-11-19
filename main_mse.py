@@ -216,7 +216,7 @@ if __name__ == '__main__':
             arg = np.argsort(uncertainty)
 
             labeled_set += list(torch.tensor(subset)[arg][-ADDENDUM:].numpy())
-            unlabeled_set = list(torch.tensor(subset)[arg][:-ADDENDUM].numpy()) + unlabeled_set[SUBSET:]
+            unlabeled_set = list(torch.tensor(subset)[arg][:-ADDENDUM].numpy())# + unlabeled_set[SUBSET:]
 
             dataloaders['train'] = DataLoader(data_train, batch_size=BATCH,
                                               sampler=SubsetRandomSampler(labeled_set),
