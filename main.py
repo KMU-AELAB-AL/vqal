@@ -197,7 +197,7 @@ if __name__ == '__main__':
     code_gen.load_state_dict(checkpoint['ae_state_dict'])
     code_gen.cuda()
 
-    dataloader = DataLoader(data_train, batch_size=BATCH, pin_memory=True)
+    dataloader = DataLoader(data_module, batch_size=BATCH, pin_memory=True)
     index_idf = set_idf(code_gen, dataloader)
 
     for trial in range(TRIALS):
