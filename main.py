@@ -36,12 +36,10 @@ transforms = Cifar()
 if DATASET == 'cifar10':
     data_train = CIFAR10('./data', train=True, download=True, transform=transforms.train_transform)
     data_unlabeled = CIFAR10('./data', train=True, download=True, transform=transforms.test_transform)
-    data_module = CIFAR10('./data', train=True, download=True, transform=transforms.test_transform)
     data_test = CIFAR10('./data', train=False, download=True, transform=transforms.test_transform)
 elif DATASET == 'cifar100':
     data_train = CIFAR100('./data', train=True, download=True, transform=transforms.train_transform)
     data_unlabeled = CIFAR100('./data', train=True, download=True, transform=transforms.test_transform)
-    data_module = CIFAR100('./data', train=True, download=True, transform=transforms.test_transform)
     data_test = CIFAR100('./data', train=False, download=True, transform=transforms.test_transform)
 
 
@@ -197,7 +195,7 @@ if __name__ == '__main__':
     code_gen.load_state_dict(checkpoint['ae_state_dict'])
     code_gen.cuda()
 
-    dataloader = DataLoader(data_module, batch_size=BATCH, pin_memory=True)
+    dataloader = DataLoader(data_unlabeled, batch_size=BATCH, pin_memory=True)
     index_idf = set_idf(code_gen, dataloader)
 
     for trial in range(TRIALS):
@@ -246,7 +244,7 @@ if __name__ == '__main__':
             unlabeled_loader = DataLoader(data_unlabeled, batch_size=BATCH,
                                           sampler=SubsetSequentialSampler(subset),
                                           pin_memory=True)
-            labeled_loader = DataLoader(data_module, batch_size=BATCH,
+            labeled_loader = DataLoader(data_unlabeled, batch_size=BATCH,
                                         sampler=SubsetSequentialSampler(labeled_set),
                                         pin_memory=True)
 
