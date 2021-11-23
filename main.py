@@ -246,8 +246,11 @@ if __name__ == '__main__':
             unlabeled_loader = DataLoader(data_unlabeled, batch_size=BATCH,
                                           sampler=SubsetSequentialSampler(subset),
                                           pin_memory=True)
+            labeled_loader = DataLoader(data_module, batch_size=BATCH,
+                                        sampler=SubsetSequentialSampler(labeled_set),
+                                        pin_memory=True)
 
-            ordered_set = get_uncertainty(models, code_gen, index_idf, unlabeled_loader, train_loader, subset)
+            ordered_set = get_uncertainty(models, code_gen, index_idf, unlabeled_loader, labeled_loader, subset)
 
             labeled_set += ordered_set[:ADDENDUM]
             unlabeled_set = list(set(unlabeled_set) - set(labeled_set))
