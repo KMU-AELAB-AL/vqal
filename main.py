@@ -133,36 +133,38 @@ def train(models, criterion, optimizers, schedulers, dataloaders, num_epochs, ep
 def get_uncertainty(models, code_gen, index_idf, unlabeled_loader, train_loader, subset):
     models['backbone'].eval()
     models['module'].eval()
+    code_gen.eval()
 
     labeled_indices = []
-    for curr_it, data in enumerate(tqdm(train_loader, leave=False, total=len(train_loader))):
-        inputs = data[0].cuda()
+    with torch.no_grad():
+        for curr_it, data in enumerate(tqdm(train_loader, leave=False, total=len(train_loader))):
+            inputs = data[0].cuda()
 
-        _, _, _, indices = code_gen(inputs)
-        indices = indices.cpu().tolist()
+            _, _, _, indices = code_gen(inputs)
+            indices = indices.cpu().tolist()
 
-        for idx in range(len(indices)):
-            labeled_indices += indices[idx]
+            for idx in range(len(indices)):
+                labeled_indices += indices[idx]
 
     #############################
     labeled_index_cnt = Counter(labeled_indices)
     labeled_index_set = set(labeled_index_cnt.keys())
 
-
     index = 0
     unlabeled_set = []
-    for curr_it, data in enumerate(tqdm(train_loader, leave=False, total=len(unlabeled_loader))):
-        inputs = data[0].cuda()
+    with torch.no_grad():
+        for curr_it, data in enumerate(tqdm(train_loader, leave=False, total=len(unlabeled_loader))):
+            inputs = data[0].cuda()
 
-        _, _, _, indices = code_gen(inputs)
-        indices = indices.cpu().tolist()
+            _, _, _, indices = code_gen(inputs)
+            indices = indices.cpu().tolist()
 
-        for idx in range(len(indices)):
-            tmp_indices = set(indices[idx])
-            unlabeled_set.append([subset[index],
-                                  sum([index_idf[key] * labeled_index_cnt[key]
-                                       for key in set(tmp_indices) & labeled_index_set])])
-            index += 1
+            for idx in range(len(indices)):
+                tmp_indices = set(indices[idx])
+                unlabeled_set.append([subset[index],
+                                      sum([index_idf[key] * labeled_index_cnt[key]
+                                           for key in set(tmp_indices) & labeled_index_set])])
+                index += 1
 
     ordered_set = list(np.array(sorted(unlabeled_set, key=lambda x: x[1]))[:, 0])
 
@@ -170,15 +172,18 @@ def get_uncertainty(models, code_gen, index_idf, unlabeled_loader, train_loader,
 
 
 def set_idf(code_gen, dataloader):
+    code_gen.eval()
+
     index_lst = []
-    for curr_it, data in enumerate(tqdm(dataloader, leave=False, total=len(dataloader))):
-        inputs = data[0].cuda()
+    with torch.no_grad():
+        for curr_it, data in enumerate(tqdm(dataloader, leave=False, total=len(dataloader))):
+            inputs = data[0].cuda()
 
-        _, _, _, indices = code_gen(inputs)
-        indices = indices.cpu().tolist()
+            _, _, _, indices = code_gen(inputs)
+            indices = indices.cpu().tolist()
 
-        for idx in range(len(indices)):
-            index_lst += indices[idx]
+            for idx in range(len(indices)):
+                index_lst += indices[idx]
 
     index_cnt = Counter(index_lst)
 
