@@ -116,12 +116,18 @@ def test(models, dataloaders, mode='val'):
     return 100 * correct / total
 
 
-def train(models, criterions, optimizers, schedulers, dataloaders, num_epochs):
+def train(models, criterion, optimizers, schedulers, dataloaders, num_epochs, epoch_loss):
     print('>> Train a Model.')
+
+    checkpoint_dir = os.path.join(f'./trained', 'weights')
+    if not os.path.exists(checkpoint_dir):
+        os.makedirs(checkpoint_dir)
 
     for epoch in range(num_epochs):
         schedulers['backbone'].step()
-        train_epoch(models, criterions, optimizers, dataloaders)
+        schedulers['module'].step()
+
+        train_epoch(models, criterion, optimizers, dataloaders, epoch, epoch_loss)
 
     print('>> Finished.')
 
