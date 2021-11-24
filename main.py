@@ -130,14 +130,14 @@ def train(models, criterion, optimizers, schedulers, dataloaders, num_epochs, ep
     print('>> Finished.')
 
 
-def get_uncertainty(models, code_gen, index_idf, unlabeled_loader, train_loader, subset):
+def get_uncertainty(models, code_gen, index_idf, unlabeled_loader, labeled_loader, subset):
     models['backbone'].eval()
     models['module'].eval()
     code_gen.eval()
 
     labeled_indices = []
     with torch.no_grad():
-        for curr_it, data in enumerate(tqdm(train_loader, leave=False, total=len(train_loader))):
+        for curr_it, data in enumerate(tqdm(labeled_loader, leave=False, total=len(labeled_loader))):
             inputs = data[0].cuda()
 
             _, _, _, indices = code_gen(inputs)
