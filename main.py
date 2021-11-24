@@ -153,7 +153,7 @@ def get_uncertainty(models, code_gen, index_idf, unlabeled_loader, train_loader,
     index = 0
     unlabeled_set = []
     with torch.no_grad():
-        for curr_it, data in enumerate(tqdm(train_loader, leave=False, total=len(unlabeled_loader))):
+        for curr_it, data in enumerate(tqdm(unlabeled_loader, leave=False, total=len(unlabeled_loader))):
             inputs = data[0].cuda()
 
             _, _, _, indices = code_gen(inputs)
