@@ -166,7 +166,7 @@ def get_uncertainty(models, code_gen, index_idf, unlabeled_loader, train_loader,
                                            for key in set(tmp_indices) & labeled_index_set])])
                 index += 1
 
-    ordered_set = list(np.array(sorted(unlabeled_set, key=lambda x: x[1]))[:, 0])
+    ordered_set = list(np.array(sorted(unlabeled_set, key=lambda x: x[1]))[:, 0].astype(np.int64))
 
     return ordered_set
 
